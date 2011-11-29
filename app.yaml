@@ -1,9 +1,14 @@
-﻿application: aep-sample
+application: aep-s1
 version: 1
 runtime: python
 api_version: 1
 
 default_expiration: '3650d'
+
+builtins:
+- datastore_admin: on
+- appstats: on
+- remote_api: on
 
 handlers:
 - url: /remote_api
@@ -18,3 +23,33 @@ handlers:
 - url: /.*
   script: common/appenginepatch/main.py
   secure: optional
+
+inbound_services:
+  - warmup
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?.*/.git/.*
+- ^(.*/)?\.git.*
+- ^(.*/)?\.gitignore
+- ^(.*/)?.*\.cld
+- ^(.*/)?.*/.svn/.*
+- ^(.*/)?\.svnignore
+- ^(.*/)?.*/tests/.*
+- ^(.*/)?scripts/.*
+- ^(.*/)?.*\.sh
+- ^(.*/)?.*\.bat
+- ^(.*/)?.*\.rst
+- ^(.*/)?.*/Makefile
+- ^(.*/)?.*/README.*
+- ^(.*/)?\.settings
+- ^(.*/)?\.project
+- ^(.*/)?\.pydevproject
