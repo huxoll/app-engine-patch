@@ -15,6 +15,9 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 DEFAULT_NAMES = ('verbose_name', 'ordering', 'permissions', 'app_label',
                  'abstract', 'db_table', 'db_tablespace')
 
+# Max results for admin queries
+MAX_RESULTS = 10001
+ 
 # Add checkpoints to patching procedure, so we don't apply certain patches
 # multiple times. This can happen if an exeception gets raised on the first
 # request of an instance. In that case, main.py gets reloaded and patch_all()
@@ -55,14 +58,14 @@ def patch_python():
 
 def patch_app_engine():
     # This allows for using Paginator on a Query object. We limit the number
-    # of results to 301, so there won't be any timeouts (301, so you can say
-    # "more than 300 results").
+    # of results to MAX_RESULTS, so there won't be any timeouts (MAX_RESULTS+1, 
+    # so you can say "more than MAX_RESULTS results").
     def __len__(self):
         return self.count()
     db.Query.__len__ = __len__
-    
+
     old_count = db.Query.count
-    def count(self, limit=301):
+    def count(self, limit=MAX_RESULTS+1):
         return old_count(self, limit)
     db.Query.count = count
     
@@ -76,6 +79,11 @@ def patch_app_engine():
     db.Query.model = ModelProperty()
     db.GqlQuery.model = ModelProperty()
 
+    #JHG: Added, to satisfy django_restapi, which expect query to have _clone
+    def noop_clone(self):
+        return self
+    db.Query._clone = noop_clone
+    
     # Add a few Model methods that are needed for serialization and ModelForm
     def _get_pk_val(self):
         if self.has_key():
@@ -177,7 +185,7 @@ def patch_app_engine():
         """Flattened version of choices tuple."""
         if not self.choices:
             return []
-        if not isinstance(choices[0], (list, tuple)):
+        if not isinstance(self.choices, (list, tuple)):
             return [(choice, choice) for choice in self.choices]
         flat = []
         for choice, value in self.choices:
@@ -620,15 +628,21 @@ def patch_app_engine():
     if not hasattr(db.delete, 'patched'):
         old_db_delete = db.delete
         def delete(models, *args, **kwargs):
-            if not isinstance(models, (list, tuple)):
+            if not isinstance(models, (list, tuple, db.Query)):
                 items = (models,)
             else:
                 items = models
+            have_something = False
             for item in items:
+                if item is None:
+                    continue
                 if not isinstance(item, db.Model):
                     continue
+                have_something = True
                 signals.pre_delete.send(sender=item.__class__, instance=item)
-            result = old_db_delete(models, *args, **kwargs)
+            result = None
+            if have_something:
+                result = old_db_delete(models, *args, **kwargs)
             for item in items:
                 if not isinstance(item, db.Model):
                     continue
@@ -645,7 +659,7 @@ def patch_app_engine():
             return first_choice + list(self.choices)
         if self.rel:
             return first_choice + [(obj.pk, unicode(obj))
-                                   for obj in self.rel.to.all().fetch(301)]
+                                   for obj in self.rel.to.all().fetch(MAX_RESULTS)]
         return first_choice
     db.Property.get_choices = get_choices
 
