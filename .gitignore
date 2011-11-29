@@ -1,0 +1,7 @@
+*.pyc
+.svn
+_generated_media
+.dynamic_media
+.i18n
+.DS_Store
+.settings
