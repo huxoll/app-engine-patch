@@ -6,3 +6,5 @@ _generated_media
 .DS_Store
 .settings
 *.espressostorage
+.project
+.pydevproject
