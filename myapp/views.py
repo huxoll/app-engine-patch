@@ -50,3 +50,39 @@ def create_admin_user(request):
         user.set_password('admin')
         user.put()
     return render_to_response(request, 'myapp/admin_created.html')
+
+def ah_warmup(request):
+    """
+    This handler is hit by GAE every time a new instance is brought up.
+    This ensures a real user request doesn't see a delay while the imports are
+    resolved, caches are loaded, etc.
+    """
+    return HttpResponse("ah_warmup complete.")
+
+def ah_start(request):
+    """
+    This handler is hit by GAE every time a new backend instance is brought up.
+    """
+    return HttpResponse("ah_start complete.")
+
+def ah_stop(request):
+    """
+    This handler is hit by GAE every time an instance is to be terminated.
+    """
+    return HttpResponse("ah_stop complete.")
+
+def ah_queue_deferred(request):
+    """
+    We use this to get around the app engine patch interfering with the
+    deferred library.  Using the default deferred causes all sorts of sporadic
+    errors to occur from the sequence of unzipping the django libraries.
+    """
+
+    from google.appengine.ext import deferred
+    try:
+        deferred.run(request.raw_post_data)
+    except PermanentTaskFailure, e:
+        logging.error("Permanent task failure; task will never finish.")
+        raise e
+    return HttpResponse("ah_queue_deferred replacement complete.")
+

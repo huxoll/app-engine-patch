@@ -17,4 +17,8 @@ urlpatterns = auth_patterns + patterns('',
     url(r'^account/register/$', 'registration.views.register',
         kwargs={'form_class': UserRegistrationForm},
         name='registration_register'),
+    url(r'^_ah/queue/deferred', 'myapp.views.ah_queue_deferred', name='ah_queue_deferred'),
+    url(r'^_ah/warmup', 'myapp.views.ah_warmup', name='ah_warmup'),
+    url(r'^_ah/start', 'myapp.views.ah_start', name='ah_start'),
+    url(r'^_ah/stop', 'myapp.views.ah_stop', name='ah_stop'),
 ) + urlpatterns
