@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
+{% load from_settings %}
 {% block title %}Welcome!{% endblock %}
 
 {% block content %}
 <h1>Welcome to the app-engine-patch sample project</h1>
-<p>This site is a demonstration of <a href="https://github.com/huxoll/app-engine-patch">app-engine-patch</a> which is an <a href="http://code.google.com/appengine/">App Engine</a> port of the <a href="http://www.djangoproject.com/">Django</a> web framework.</p>
+<p>This site is a demonstration of 
+<a href="https://github.com/huxoll/app-engine-patch">app-engine-patch</a> 
+which is an <a href="http://code.google.com/appengine/">App Engine</a> 
+port of the <a href="http://www.djangoproject.com/">Django</a> web framework.</p>
+
+<p>This deployment is based on app-engine-patch version 
+{% from_settings AEP_VERSION %}.</p>
 
 <h2>Examples</h2>
 <p>
