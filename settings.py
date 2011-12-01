@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from ragendja.settings_pre import *
 
+# This will be embedded in a page, to declare version for trouble reports, etc.
+AEP_VERSION = '1.2RC1'
+
 # Increase this when you update your media on the production site, so users
 # don't have to refresh their cache. By setting this your MEDIA_URL
 # automatically becomes /media/MEDIA_VERSION/
@@ -101,6 +104,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'appenginepatcher',
     'ragendja',
+    'aep',
     'myapp',
     'registration',
     'mediautils',
@@ -121,17 +125,19 @@ DATABASE_OPTIONS = {
     # Don't forget to also update your app.yaml!
     #'remote_url': '/remote-secret-url',
 
-    # !!!Normally, the following settings should not be used!!!
+    # Normally, the following settings should not be used!!!
 
     # Always use remoteapi (no need to add manage.py --remote option)
     #'use_remote': True,
 
     # Change appid for remote connection (by default it's the same as in
     # your app.yaml)
-    #'remote_id': 'otherappid',
+    # Due to recent google changes, the remote ID will always be different 
+    # (there will be an s~ prepended.).
+    'remote_id': 's~aep-s1',
 
     # Change domain (default: <remoteid>.appspot.com)
-    #'remote_host': 'bla.com',
+    'remote_host': 'aep-s1.appspot.com',
 }
 
 from ragendja.settings_post import *
