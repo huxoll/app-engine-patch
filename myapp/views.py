@@ -77,7 +77,6 @@ def ah_queue_deferred(request):
     deferred library.  Using the default deferred causes all sorts of sporadic
     errors to occur from the sequence of unzipping the django libraries.
     """
-
     from google.appengine.ext import deferred
     try:
         deferred.run(request.raw_post_data)

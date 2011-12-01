@@ -1,7 +1,7 @@
 h1. app-engine-patch users!!!
 
 This is a version of Blueprint CSS adapted to the app-engine-patch media generator:
-http://code.google.com/p/app-engine-patch/wiki/MediaGenerator
+https://github.com/huxoll/app-engine-patch/wiki/MediaGenerator
 
 You don't need to use Blueprint's CSS generator/compressor.
 
