@@ -69,7 +69,7 @@ def setup_env(manage_py_env=False):
     if not manage_py_env:
         return
 
-    print >> sys.stderr, 'Running on app-engine-patch 1.1'
+    print >> sys.stderr, 'Running on app-engine-patch 1.2'
 
 def setup_project():
     from appenginepatcher import on_production_server
