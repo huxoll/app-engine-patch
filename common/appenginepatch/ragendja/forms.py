@@ -12,7 +12,7 @@ from google.appengine.ext import db
 class FakeModelIterator(object):
     def __init__(self, fake_model):
         self.fake_model = fake_model
-    
+
     def __iter__(self):
         for item in self.fake_model.all():
             yield (item.get_value_for_datastore(), unicode(item))
@@ -182,13 +182,13 @@ class FormWithSetsInstance(object):
 
     def __unicode__(self):
         return self.as_table()
-    
+
     def is_valid(self):
         result = self.form.is_valid()
         for bf in self.formsets:
             result = bf.formset.is_valid() and result
         return result
-    
+
     def save(self, *args,  **kwargs):
         def save_forms(forms, obj=None):
             for form in forms:
@@ -329,7 +329,7 @@ class FormSetWidget(Widget):
 class FormSetField(Field):
 
     def __init__(self, model, widget=FormSetWidget, label=None, initial=None,
-                 help_text=None, error_messages=None, show_hidden_initial=False, 
+                 help_text=None, error_messages=None, show_hidden_initial=False,
                  formset_factory=inlineformset_factory, *args, **kwargs):
         widget = widget(self)
         super(FormSetField, self).__init__(required=False, widget=widget, label=label, initial=initial, help_text=help_text, error_messages=error_messages, show_hidden_initial=show_hidden_initial)

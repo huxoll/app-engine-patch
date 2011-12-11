@@ -17,7 +17,7 @@ DEFAULT_NAMES = ('verbose_name', 'ordering', 'permissions', 'app_label',
 
 # Max results for admin queries
 MAX_RESULTS = 10001
- 
+
 # Add checkpoints to patching procedure, so we don't apply certain patches
 # multiple times. This can happen if an exeception gets raised on the first
 # request of an instance. In that case, main.py gets reloaded and patch_all()
@@ -30,10 +30,10 @@ def patch_all():
         return
     patch_python()
     patch_app_engine()
-    
+
     # Add signals: post_save_committed, post_delete_committed
     from appenginepatcher import transactions
-    
+
     setup_logging()
     done_patch_all = True
 
@@ -58,7 +58,7 @@ def patch_python():
 
 def patch_app_engine():
     # This allows for using Paginator on a Query object. We limit the number
-    # of results to MAX_RESULTS, so there won't be any timeouts (MAX_RESULTS+1, 
+    # of results to MAX_RESULTS, so there won't be any timeouts (MAX_RESULTS+1,
     # so you can say "more than MAX_RESULTS results").
     def __len__(self):
         return self.count()
@@ -68,7 +68,7 @@ def patch_app_engine():
     def count(self, limit=MAX_RESULTS+1):
         return old_count(self, limit)
     db.Query.count = count
-    
+
     # Add "model" property to Query (needed by generic views)
     class ModelProperty(object):
         def __get__(self, query, unused):
@@ -79,11 +79,11 @@ def patch_app_engine():
     db.Query.model = ModelProperty()
     db.GqlQuery.model = ModelProperty()
 
-    #JHG: Added, to satisfy django_restapi, which expect query to have _clone
+    # Added, to satisfy django_restapi, which expect query to have _clone
     def noop_clone(self):
         return self
     db.Query._clone = noop_clone
-    
+
     # Add a few Model methods that are needed for serialization and ModelForm
     def _get_pk_val(self):
         if self.has_key():
@@ -195,7 +195,7 @@ def patch_app_engine():
                 flat.append((choice,value))
         return flat
     db.Property.flatchoices = property(_get_flatchoices)
-    
+
     # Add repr to make debugging a little bit easier
     def __repr__(self):
         data = []
@@ -312,7 +312,7 @@ def patch_app_engine():
 
         def _set_db_table(self, db_table):
             self._db_table = db_table
-        
+
         def _get_db_table(self):
             if getattr(settings, 'DJANGO_STYLE_MODEL_KIND', True):
                 if hasattr(self, '_db_table'):
@@ -324,7 +324,7 @@ def patch_app_engine():
 
         def _set_db_tablespace(self, db_tablespace):
             self._db_tablespace = db_tablespace
-        
+
         def _get_db_tablespace(self):
             if hasattr(self, '_db_tablespace'):
                 return self._db_tablespace
@@ -526,7 +526,7 @@ def patch_app_engine():
 
     # Required to support reference properties to db.Model
     db.Model._meta = _meta(db.Model, ())
-    
+
     def _initialize_model(cls, bases):
         cls._meta = _meta(cls, bases)
         cls._default_manager = cls
@@ -671,8 +671,8 @@ def fix_app_engine_bugs():
     # http://code.google.com/p/googleappengine/issues/detail?id=583
     from django import forms
     from django.utils.text import capfirst
-    # This import is needed, so the djangoforms patch can do its work, first
-    from google.appengine.ext.db import djangoforms
+    # The djangoforms patch, which used to part of google prior to 2.7 support
+    import djangoforms
     def get_form_field(self, form_class=forms.CharField, **kwargs):
         defaults = {'required': self.required}
         defaults['label'] = capfirst(self.verbose_name)
